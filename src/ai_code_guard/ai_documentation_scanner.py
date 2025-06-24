@@ -39,7 +39,6 @@ class AIDocumentationScanner:
                 "files_with_ai_content": 0,
                 "ai_mentions": []
             }
-
             # Process each documentation file
             for doc_path in repo_data.get("documentation_files", []):
                 file_result = self._analyze_single_doc(doc_path)
@@ -152,48 +151,48 @@ class AIDocumentationScanner:
             }
 
 
-def save_results(self, results: Dict, output_path: str = "ai_documentation_scan.json"):
-    """
-    Save scan results to a JSON file
-    """
-    try:
-        with open(output_path, 'w') as f:
-            json.dump(results, f, indent=2)
-        print(f"\nResults saved to: {output_path}")
-    except Exception as e:
-        print(f"Error saving results: {e}")
+    def save_results(self, results: Dict, output_path: str = "ai_documentation_scan.json"):
+        """
+        Save scan results to a JSON file
+        """
+        try:
+            with open(output_path, 'w') as f:
+                json.dump(results, f, indent=2)
+            print(f"\nResults saved to: {output_path}")
+        except Exception as e:
+            print(f"Error saving results: {e}")
 
 
-@staticmethod
-def print_scan_results(results: Dict):
-    """
-    Print scan results in a readable format
-    """
-    print("\nAI Documentation Scan Results")
-    print("=" * 50)
+    @staticmethod
+    def print_scan_results(results: Dict):
+        """
+        Print scan results in a readable format
+        """
+        print("\nAI Documentation Scan Results")
+        print("=" * 50)
 
-    if "error" in results:
-        print(f"\nError occurred during scanning: {results['error']}")
-        return
+        if "error" in results:
+            print(f"\nError occurred during scanning: {results['error']}")
+            return
 
-    print(f"\nFiles Scanned: {results['files_scanned']}")
-    print(f"Files with AI Content: {results['files_with_ai_content']}")
+        print(f"\nFiles Scanned: {results['files_scanned']}")
+        print(f"Files with AI Content: {results['files_with_ai_content']}")
 
-    if results['files_with_ai_content'] > 0:
-        print("\nDetailed Findings:")
-        print("-" * 30)
-
-        for file_result in results['ai_mentions']:
-            print(f"\nFile: {file_result['file_path']}")
-            print(f"Summary: {file_result['summary']}")
-
-            if file_result['ai_mentions']:
-                print("\nAI Mentions:")
-                for mention in file_result['ai_mentions']:
-                    print(f"  - Type: {mention['type']}")
-                    print(f"    Mention: {mention['mention']}")
-                    print(f"    Context: {mention['context']}")
+        if results['files_with_ai_content'] > 0:
+            print("\nDetailed Findings:")
             print("-" * 30)
+
+            for file_result in results['ai_mentions']:
+                print(f"\nFile: {file_result['file_path']}")
+                print(f"Summary: {file_result['summary']}")
+
+                if file_result['ai_mentions']:
+                    print("\nAI Mentions:")
+                    for mention in file_result['ai_mentions']:
+                        print(f"  - Type: {mention['type']}")
+                        print(f"    Mention: {mention['mention']}")
+                        print(f"    Context: {mention['context']}")
+                print("-" * 30)
 
 
 # Example usage
