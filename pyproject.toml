@@ -15,7 +15,9 @@ license = {text = "Proprietary"}
 authors = [
     {name = "Bosch Innovation Campus Berlin"}
 ]
-dependencies = []
+dependencies = [
+    "requests>=2.32.4",
+]
 
 [project.optional-dependencies]
 dev = [
