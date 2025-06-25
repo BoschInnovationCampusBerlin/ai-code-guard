@@ -1,7 +1,9 @@
 import streamlit as st
 
+from ai_code_guard.eu_ai_act_agent import query
 from ai_code_guard.github import download_github_repo
 from ai_code_guard.summarize_project import summarize
+from ai_code_guard.usage_extraction import extract_ai_usage
 
 # Page configuration
 st.set_page_config(page_title="AI Project Compliance Checker", layout="centered")
@@ -24,9 +26,15 @@ def st_progress_callback(message: str):
 
 
 def process_repository(repo_url):
-    repo_dir = download_github_repo(repo_url, "master", status_callback=st_progress_callback)
+    repo_dir = download_github_repo(repo_url, status_callback=st_progress_callback)
 
     summarize(repo_dir, st_progress_callback)
+
+    use_cases = extract_ai_usage(repo_dir, st_progress_callback)
+
+    query_result = query(str(use_cases))
+
+
 
 
 if st.button("Process"):
