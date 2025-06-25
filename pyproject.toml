@@ -20,6 +20,7 @@ dependencies = [
     "python-dotenv>=1.1.0",
     "requests>=2.32.3",
     "aider-chat>=0.84.0"
+    "streamlit>=1.46.0",
 ]
 
 [project.optional-dependencies]
