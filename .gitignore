@@ -4,5 +4,10 @@
 /.vscode
 /.venv
 /.env
+/.attic
+/.aider*
 
 __pycache__
+.DS_Store
+
+app/data/
