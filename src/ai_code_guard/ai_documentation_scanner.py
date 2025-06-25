@@ -303,18 +303,3 @@ if __name__ == "__main__":
 
     # Save results
     scanner.save_results(results)
-
-
-# Example usage
-if __name__ == "__main__":
-    # Initialize scanner
-    scanner = AIDocumentationScanner('repo_analysis.json')
-
-    # Scan files
-    results = scanner.scan_for_ai_content()
-
-    # Print results
-    AIDocumentationScanner.print_scan_results(results)
-
-    # Save results
-    scanner.save_results(results)
