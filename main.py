@@ -12,10 +12,13 @@ if __name__ == "__main__":
     
     # Initialize the application (download EU AI Act and create vector store)
     initialization_result = initialize_app()
-    if initialization_result["status"] != "success":
-        print(f"Warning: Application initialization had issues: {initialization_result['error']}")
-    else:
+    if initialization_result["status"] == "success":
         print(f"Application initialized successfully. Vector store has {initialization_result['vectorstore_size']} documents.")
+    elif initialization_result["status"] == "partial":
+        print(f"Warning: Application initialization had issues: {initialization_result['error']}")
+        print(f"Continuing with limited functionality: {initialization_result.get('message', '')}")
+    else:
+        print(f"Warning: Application initialization had issues: {initialization_result['error']}")
     
     # Run the Streamlit app
     run_app()
