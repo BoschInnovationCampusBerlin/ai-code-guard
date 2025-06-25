@@ -17,6 +17,7 @@ authors = [
 ]
 dependencies = [
     "requests>=2.32.4",
+    "streamlit>=1.46.0",
 ]
 
 [project.optional-dependencies]
