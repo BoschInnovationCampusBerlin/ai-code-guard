@@ -1,5 +1,7 @@
-import time
 import streamlit as st
+
+from ai_code_guard.github import download_github_repo
+from ai_code_guard.summarize_project import summarize
 
 # Page configuration
 st.set_page_config(page_title="AI Project Compliance Checker", layout="centered")
@@ -10,67 +12,86 @@ st.markdown("_Analyze any public GitHub repo for AI usage and EU AI Act complian
 # Input section
 repo_url = st.text_input("Enter GitHub Repository URL:")
 
+steps = st.container()
+
+
+def st_progress_callback(message: str):
+    """Append a message to the steps container."""
+
+    with steps:
+        print(message)
+        st.markdown(message)
+
+
+def process_repository(repo_url):
+    repo_dir = download_github_repo(repo_url, "master", status_callback=st_progress_callback)
+
+    summarize(repo_dir, st_progress_callback)
+
+
 if st.button("Process"):
-    # Define steps
-    steps = [
-        "Downloading Repository",
-        "Extracting Repository",
-        "Summarizing Project",
-        "Checking if AI is used",
-        "Extracting and identifying types of AI usage",
-        "Finding EU AI Act Use Cases",
-        "Checking if EU AI Act applies",
-        "Generating Compliance Report"
-    ]
+    process_repository(repo_url)
 
-    # Initialize status containers with waiting text
-    status_containers = {step: st.empty() for step in steps}
-    for step in steps:
-        with status_containers[step].container():
-            st.subheader(f"**{step}**")
-            st.write("Waiting for previous step...")
+    # # Define steps
+    # steps = [
+    #     "Downloading Repository",
+    #     "Extracting Repository",
+    #     "Summarizing Project",
+    #     "Checking if AI is used",
+    #     "Extracting and identifying types of AI usage",
+    #     "Finding EU AI Act Use Cases",
+    #     "Checking if EU AI Act applies",
+    #     "Generating Compliance Report",
+    # ]
 
-    def show_running(step, message, function):
-        with status_containers[step].container():
-            st.subheader(f"**{step}**")
-            st.badge("Running", color="blue")
-            with st.spinner(f"{step} in progress..."):
-                return function()
+    # # Initialize status containers with waiting text
+    # status_containers = {step: st.empty() for step in steps}
+    # for step in steps:
+    #     with status_containers[step].container():
+    #         st.subheader(f"**{step}**")
+    #         st.write("Waiting for previous step...")
 
-    # Helper to update status
-    def show_result(step, message, success=True):
-        if success:
-            with status_containers[step].container():
-                st.subheader(f"**{step}**")
-                st.badge("Success", icon=":material/check:", color="green")
-                st.expander("Details", expanded=True).write(message)
-        else:
-            with status_containers[step].container():
-                st.subheader(f"**{step}**")
-                st.badge("Error", color="red")
-                st.write(message)
-                st.stop()
+    # def show_running(step, message, function):
+    #     with status_containers[step].container():
+    #         st.subheader(f"**{step}**")
+    #         st.badge("Running", color="blue")
+    #         with st.spinner(f"{step} in progress..."):
+    #             return function()
 
-    # Step 1
-    def download_repository():
-        time.sleep(2)
-        return "Repository downloaded successfully."
+    # # Helper to update status
+    # def show_result(step, message, success=True):
+    #     if success:
+    #         with status_containers[step].container():
+    #             st.subheader(f"**{step}**")
+    #             st.badge("Success", icon=":material/check:", color="green")
+    #             st.expander("Details", expanded=True).write(message)
+    #     else:
+    #         with status_containers[step].container():
+    #             st.subheader(f"**{step}**")
+    #             st.badge("Error", color="red")
+    #             st.write(message)
+    #             st.stop()
 
-    step = steps[0]
-    with status_containers[step].container():
-        result = show_running(step, "Downloading repository...", download_repository)
+    # # Step 1
+    # def download_repository():
+    #     time.sleep(2)
+    #     return "Repository downloaded successfully."
 
-    # After delay, show completed status
-    show_result(step, result, success=True if result else False)
+    # step = steps[0]
+    # with status_containers[step].container():
+    #     result = show_running(step, "Downloading repository...", download_repository)
 
-    # Step 2
-    def extract_repository():
-        time.sleep(2)
-        return "Repository extracted successfully."
+    # # After delay, show completed status
+    # show_result(step, result, success=True if result else False)
 
-    step = steps[1]
-    with status_containers[step].container():
-        result = show_running(step, "Extracting repository...", extract_repository)
+    # # Step 2
+    # def extract_repository():
+    #     time.sleep(2)
+    #     return "Repository extracted successfully."
 
-    # After delay, show completed status
-    show_result(step, result, success=True if result else False)
+    # step = steps[1]
+    # with status_containers[step].container():
+    #     result = show_running(step, "Extracting repository...", extract_repository)
+
+    # # After delay, show completed status
+    # show_result(step, result, success=True if result else False)

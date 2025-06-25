@@ -1,15 +1,16 @@
 import os
 import re
+from typing import Callable
 import zipfile
 import io
+import sys
 
 import requests
-import sys
 
 REPOS_DIR = "repos"
 
 
-def download_github_repo(url: str, branch: str = "main"):
+def download_github_repo(url: str, branch: str = "main", status_callback: Callable[[str], None] = None) -> str:
     """
     Validates a GitHub repository URL and downloads its source code as a zip file.
 
@@ -38,15 +39,18 @@ def download_github_repo(url: str, branch: str = "main"):
     zip_url = f"https://github.com/{user}/{repo}/archive/refs/heads/{branch}.zip"
 
     # Download only the specified branch, do not fallback
+    status_callback("Downloading repository zip file...")
     response = requests.get(zip_url)
     if response.status_code != 200:
         raise ValueError(f"Could not download repository zip file for branch '{branch}'.")
 
     # Extract zip file
+    status_callback("Unpacking repository zip file...")
     with zipfile.ZipFile(io.BytesIO(response.content)) as z:
         z.extractall(repos_dir)
         extracted_folder = os.path.join(repos_dir, z.namelist()[0].split("/")[0])
 
+    status_callback("Repository downloaded and extracted successfully.")
     return extracted_folder
 
 
