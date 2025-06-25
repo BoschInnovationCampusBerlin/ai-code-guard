@@ -16,7 +16,10 @@ authors = [
     {name = "Bosch Innovation Campus Berlin"}
 ]
 dependencies = [
-    "requests>=2.32.4",
+    "openai>=1.75.0",
+    "python-dotenv>=1.1.0",
+    "requests>=2.32.3",
+    "aider-chat>=0.84.0"
 ]
 
 [project.optional-dependencies]
