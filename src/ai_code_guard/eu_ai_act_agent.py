@@ -3,7 +3,7 @@ import requests
 # server = "http://localhost:8000"
 server = "http://10.12.246.125:8000"
 
-def query(use_cases: str):
+def query(use_cases: dict):
     prompt = (
         f"You get a use cases of a code repository. Is the EU AI Act relevant for this project? Use cases: {use_cases}"
     )

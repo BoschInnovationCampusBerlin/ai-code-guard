@@ -178,7 +178,11 @@ def extract_analysis_data(analysis: str):
     print(f"Debug - Raw LLM response: {raw_content}")
 
     # Parse the JSON response
-    structured_data = json.loads(raw_content)
+    try:
+        structured_data = json.loads(raw_content)
+    except json.decoder.JSONDecodeError:
+        print(f"Error decoding JSON: {raw_content}")
+        structured_data = []
     print(f"Debug - Parsed structured data type: {type(structured_data)}")
     print(
         f"Debug - Structured data keys: {structured_data.keys() if isinstance(structured_data, dict) else 'Not a dict'}")
