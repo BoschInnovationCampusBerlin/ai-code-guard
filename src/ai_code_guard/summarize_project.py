@@ -1,12 +1,12 @@
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Callable
 import json
 from openai import AzureOpenAI
 import os
 
 
-os.environ['HTTP_PROXY'] = "http://localhost:3128"
-os.environ['HTTPS_PROXY'] = "http://localhost:3128"
+os.environ["HTTP_PROXY"] = "http://localhost:3128"
+os.environ["HTTPS_PROXY"] = "http://localhost:3128"
 
 endpoint = "https://boschdemov4.openai.azure.com/openai/deployments/hackathon-gpt-4.1/chat/completions?api-version=2025-01-01-preview"
 
@@ -19,6 +19,7 @@ client = AzureOpenAI(
     api_key=subscription_key,
 )
 
+
 class RepoFileAnalyzer:
     def __init__(self, api_key=None, batch_size=50):
         self.batch_size = batch_size
@@ -28,7 +29,7 @@ class RepoFileAnalyzer:
         repo_path = Path(repo_path)
         all_files = []
 
-        for path in repo_path.rglob('*'):
+        for path in repo_path.rglob("*"):
             if path.is_file():
                 all_files.append(str(path))
 
@@ -37,7 +38,6 @@ class RepoFileAnalyzer:
     def process_batch(self, file_paths: List[str]) -> Dict:
         """Process a batch of file paths"""
         # Format file paths as a string
-
 
         # Format file paths for the prompt
         files_str = "\n".join(f"- {f}" for f in file_paths)
@@ -66,21 +66,17 @@ class RepoFileAnalyzer:
         Return ONLY valid JSON, no additional text or markdown formatting.
         """
 
-
         try:
             response = client.chat.completions.create(
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a repository structure analyzer specialized in identifying documentation and dependency files. You should be aware of various naming conventions and variations in how these files might be named."
+                        "content": "You are a repository structure analyzer specialized in identifying documentation and dependency files. You should be aware of various naming conventions and variations in how these files might be named.",
                     },
-                    {
-                        "role": "user",
-                        "content": prompt.format(files=files_str)
-                    }
+                    {"role": "user", "content": prompt.format(files=files_str)},
                 ],
                 model="hackathon-gpt-4.1",
-                temperature=1  # Low temperature for more consistent results
+                temperature=1,  # Low temperature for more consistent results
             )
             # Get the response content
             response_content = response.choices[0].message.content.strip()
@@ -93,30 +89,25 @@ class RepoFileAnalyzer:
         except Exception as e:
             return f"Error in LLM classification: {str(e)}"
 
-    def analyze_repository(self, repo_path):
+    def analyze_repository(self, repo_path, progress_callback: Callable[[str], None]):
         """Main method to analyze repository files"""
         # Get all files
         all_files = self.get_all_files(repo_path)
 
         # Skip certain directories and files
         filtered_files = [
-            f for f in all_files
-            if not any(skip in f for skip in [
-                '/.git/', '/node_modules/', '/__pycache__/',
-                '/.venv/', '/venv/', '.pyc'
-            ])
+            f
+            for f in all_files
+            if not any(skip in f for skip in ["/.git/", "/node_modules/", "/__pycache__/", "/.venv/", "/venv/", ".pyc"])
         ]
 
         # Process files in batches
-        all_results = {
-            "documentation_files": [],
-            "dependency_files": []
-        }
+        all_results = {"documentation_files": [], "dependency_files": []}
 
         # Process in batches
         for i in range(0, len(filtered_files), self.batch_size):
-            batch = filtered_files[i:i + self.batch_size]
-            print(f"\nProcessing batch {i // self.batch_size + 1} ({len(batch)} files)...")
+            batch = filtered_files[i : i + self.batch_size]
+            progress_callback(f"\nProcessing batch {i // self.batch_size + 1} ({len(batch)} files)...")
 
             batch_results = self.process_batch(batch)
 
@@ -129,34 +120,26 @@ class RepoFileAnalyzer:
         all_results["dependency_files"] = list(dict.fromkeys(all_results["dependency_files"]))
 
         return all_results
-        # Get LLM classification
-        classification = self.classify_files_with_llm(filtered_files)
-
-        return classification
 
 
-if __name__ == "__main__":
+def summarize(repo_dir, progress_callback: Callable[[str], None], batch_size=50):
     # Initialize analyzer
-    analyzer = RepoFileAnalyzer(batch_size=50)
+    analyzer = RepoFileAnalyzer(batch_size=batch_size)
 
     # Analyze repository
-    repo_path = "C:/Users/stf2bg/Desktop/ai-code-guard/repos"
-    results = analyzer.analyze_repository(repo_path)
+    result = analyzer.analyze_repository(repo_dir, progress_callback)
 
-    # Print results in a formatted way
-    print("\nFinal Repository Analysis Results:")
-    print("=" * 50)
+    # Create result report
+    report = "Analysis Result:"
 
-    print(f"\nDocumentation Files ({len(results['documentation_files'])}):")
-    for doc_file in results["documentation_files"]:
-        print(f"- {doc_file}")
+    report += f"\n\n|Documentation Files ({len(result['documentation_files'])})|\n|---|\n"
+    for doc_file in result["documentation_files"]:
+        report += f"|{doc_file.split(repo_dir)[-1]}|\n"
 
-    print(f"\nDependency Files ({len(results['dependency_files'])}):")
-    for dep_file in results["dependency_files"]:
-        print(f"- {dep_file}")
+    report += f"\n\n|Dependency Files ({len(result['dependency_files'])})|\n|---|\n"
+    for dep_file in result["dependency_files"]:
+        report += f"|{dep_file.split(repo_dir)[-1]}|\n"
 
-    # Save results as JSON
-    with open('repo_analysis.json', 'w') as f:
-        json.dump(results, f, indent=2)
+    progress_callback(report)
 
-    print(f"\nTotal files analyzed: {sum(len(v) for v in results.values())}")
+    return result
