@@ -1,6 +1,7 @@
 import os
 import sys
 from typing import Callable
+import json  # noqa
 
 from aider.coders import Coder
 from aider.models import Model
@@ -149,50 +150,40 @@ def extract_analysis_data(analysis: str):
         "required": ["codebase", "use_cases"]
     }
 
-    try:
-        # Use LLM with structured output
-        response = completion(
-            model="azure/hackathon-gpt-4.1",
-            messages=[
-                {
-                    "role": "system",
-                    "content": """You are an expert at extracting structured data from AI analysis reports. 
-                    Extract AI use cases from the provided analysis and return them in the specified JSON format.
-                    Only include use cases with AI confidence score >= 5.
-                    Be precise and accurate in your extraction."""
-                },
-                {
-                    "role": "user",
-                    "content": f"Extract the AI use cases from this analysis:\n\n{analysis}"
-                }
-            ],
-            temperature=0.1,
-            response_format={
-                "type": "json_object",
-                "schema": json_schema
+    # Use LLM with structured output
+    response = completion(
+        model="azure/hackathon-gpt-4.1",
+        messages=[
+            {
+                "role": "system",
+                "content": """You are an expert at extracting structured data from AI analysis reports. 
+                Extract AI use cases from the provided analysis and return them in the specified JSON format.
+                Only include use cases with AI confidence score >= 5.
+                Be precise and accurate in your extraction."""
+            },
+            {
+                "role": "user",
+                "content": f"Extract the AI use cases from this analysis:\n\n{analysis}"
             }
-        )
-
-        # Debug: Print the raw response
-        raw_content = response.choices[0].message.content
-        print(f"Debug - Raw LLM response: {raw_content}")
-
-        # Parse the JSON response
-        structured_data = json.loads(raw_content)
-        print(f"Debug - Parsed structured data type: {type(structured_data)}")
-        print(
-            f"Debug - Structured data keys: {structured_data.keys() if isinstance(structured_data, dict) else 'Not a dict'}")
-
-        return structured_data
-
-    except Exception as e:
-        print(f"Error in extract_structured_data: {e}")
-        # Return a fallback structure
-        return {
-            "codebase": "unknown",
-            "use_cases": [],
-            "error": str(e)
+        ],
+        temperature=0.1,
+        response_format={
+            "type": "json_object",
+            "schema": json_schema
         }
+    )
+
+    # Debug: Print the raw response
+    raw_content = response.choices[0].message.content
+    print(f"Debug - Raw LLM response: {raw_content}")
+
+    # Parse the JSON response
+    structured_data = json.loads(raw_content)
+    print(f"Debug - Parsed structured data type: {type(structured_data)}")
+    print(
+        f"Debug - Structured data keys: {structured_data.keys() if isinstance(structured_data, dict) else 'Not a dict'}")
+
+    return structured_data
 
 
 if __name__ == "__main__":

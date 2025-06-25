@@ -1,3 +1,5 @@
+import json
+
 import streamlit as st
 
 from ai_code_guard.eu_ai_act_agent import query
@@ -28,12 +30,13 @@ def st_progress_callback(message: str):
 def process_repository(repo_url):
     repo_dir = download_github_repo(repo_url, status_callback=st_progress_callback)
 
-    summarize(repo_dir, st_progress_callback)
+    # summarize(repo_dir, st_progress_callback)
 
     use_cases = extract_ai_usage(repo_dir, st_progress_callback)
 
-    query_result = query(str(use_cases))
+    query_result = query(use_cases)
 
+    st_progress_callback(query_result.json()['data']['message'])
 
 
 
