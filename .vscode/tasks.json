@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run EU AI Act Compliance Checker",
+			"type": "shell",
+			"command": "streamlit run main.py",
+			"group": "build",
+			"problemMatcher": [],
+			"isBackground": true
+		}
+	]
+}

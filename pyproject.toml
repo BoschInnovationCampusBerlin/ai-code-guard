@@ -1,60 +1,20 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[tool.hatch.build]
-packages = ["src/ai_code_guard"]
-
 [project]
-name = "ai-code-guard"
+name = "ai-act-compliance-checker"
 version = "0.1.0"
-description = "EU AI Act code guard, scans code repositories for AI Act violations"
+description = "An application that analyzes GitHub repositories against the EU AI Act"
 readme = "README.md"
-requires-python = ">=3.12,<3.13"
-license = {text = "Proprietary"}
-authors = [
-    {name = "Bosch Innovation Campus Berlin"}
-]
+requires-python = ">=3.12"
 dependencies = [
-    "requests>=2.32.4",
     "streamlit>=1.46.0",
+    "langchain>=0.1.0",
+    "langgraph>=0.1.0",
+    "pygithub>=2.1.1",
+    "pypdf>=4.0.0",
+    "faiss-cpu>=1.7.4",
+    "tiktoken>=0.5.2",
+    "python-dotenv>=1.0.0",
+    "langchain-openai>=0.0.5",
+    "langchain-community>=0.3.26",
+    "requests>=2.31.0",
+    "openai>=1.10.0",
 ]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.0.0",
-    "pytest-cov>=4.0.0",
-    "ruff>=0.1.0",
-    "mypy>=1.0.0"
-]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-addopts = "-v --cov=ai_code_guard --cov-report=term-missing"
-
-[tool.ruff]
-line-length = 100
-target-version = "py312"
-select = [
-    "E",   # pycodestyle errors
-    "W",   # pycodestyle warnings
-    "F",   # pyflakes
-    "I",   # isort
-    "C",   # flake8-comprehensions
-    "B",   # flake8-bugbear
-    "UP",  # pyupgrade
-    "N",   # pep8-naming
-    "RUF", # ruff-specific rules
-]
-fixable = ["ALL"]
-unfixable = []
-
-[tool.ruff.isort]
-known-first-party = ["ai_code_guard"]
-
-[tool.ruff.flake8-quotes]
-docstring-quotes = "double"
-
-[tool.ruff.per-file-ignores]
-"tests/*" = ["S101"]  # Ignore assert in test files

@@ -1,8 +1,13 @@
-/repos
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
 
-/.idea
-/.vscode
-/.venv
-/.env
+# Virtual environments
+.venv
+**/data/
 
-__pycache__
+.env
